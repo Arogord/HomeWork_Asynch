@@ -1,43 +1,45 @@
-﻿Print1('A');
-ThreadPool.QueueUserWorkItem(Print); 
+﻿
+//ThreadPool.QueueUserWorkItem((_)=>Print("Thread Pool"));
+//Print("Main Thread");
 
-//основной поток может выполниться быстрее чем дочерний, и программа завершится.
 
-Console.WriteLine(WriteToFileAsync().Result);
+//static void  Print(string c)
+//{
+//    for(int i = 0; i < 5; i++)
+//    {
+//        Thread.Sleep(1);
+//        Console.WriteLine(c);
+//    }
+//}
 
-//Делегат представляющеий метод, который выполняет задачу
-void Print(object? state)
+
+
+
+string path = @"\\VisualStudioProject\\HomeWork_Asynch\\content.txt";
+string TextForWrite = "Dart Waider is not Sith";
+
+
+Task task1 = Task.Run(() => WriteToFileAsync(path, TextForWrite));
+
+
+await task1.ContinueWith((tas) =>
 {
-    Print1('B');
+
+    if (task1.Exception == null)
+    {
+        Console.WriteLine("Write is ready");
+    }
+    else
+    {
+        Console.WriteLine("Write is not ready");
+        Console.WriteLine("Ошибка: " + task1.Exception.Message);
+    }
+
+});
+
+
+static async Task WriteToFileAsync(string path, string MyText)
+{
+    await File.WriteAllTextAsync(path, MyText);
 }
 
-static void  Print1(char c)
-{
-    for(int i = 0; i < 5; i++)
-    {
-        Console.WriteLine(c);
-    }
-}
-
-static async Task<string> WriteToFileAsync()
-{
-    string path =  @"c:\\VisualStudioProject\\HomeWork_Asynch\\content.txt";
-    string MyText = "Dart Waider is not Sith";
-    try
-    {
-        await File.WriteAllTextAsync(path, MyText);
-        return "Read is compleat";
-
-    }
-    catch (Exception e)
-    {
-        return "Read is not compleat";
-    }
-    
-
-}
-
-
-//. Написать асинхронный метод, который записывает в файл какую-то информацию.
-//После завершения записи, вывести на консоль информацию об успешной/неуспешной записи
-//в виде продолжения.
